@@ -4,4 +4,7 @@ module.exports = {
   experimental: {
     esmExternals: false,
   },
+  images: {
+    domains: ["localhost", "kaerwell.saleor.cloud"],
+  },
 };

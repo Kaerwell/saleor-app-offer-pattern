@@ -2,9 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { createClient, fetchExchange } from "urql";
 import { SALEOR_API_URL } from "./const";
 import Link from "next/link";
-import type { GetStorePagesQuery, GetStorePageTypeQuery } from "../generated/graphql";
-import { GetStorePagesDocument, GetStorePageTypeDocument } from "../generated/graphql";
-
+import type {
+  GetStorePagesQuery,
+  GetStorePageTypeQuery,
+} from "../generated/graphql";
+import {
+  GetStorePagesDocument,
+  GetStorePageTypeDocument,
+} from "../generated/graphql";
 const getStorePageType = async (): Promise<GetStorePageTypeQuery> => {
   const client = createClient({
     url: SALEOR_API_URL,

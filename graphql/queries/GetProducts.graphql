@@ -1,0 +1,15 @@
+query GetProducts($ids: [ID!]!, $channel: String) {
+  products(first: 100, filter: { ids: $ids }, channel: $channel) {
+    edges {
+      node {
+        id
+        name
+        description
+        media {
+          url
+          alt
+        }
+      }
+    }
+  }
+}

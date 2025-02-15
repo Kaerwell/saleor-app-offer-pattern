@@ -1,6 +1,8 @@
 import { AuthConfig, authExchange } from "@urql/exchange-auth";
 import { cacheExchange, createClient as urqlCreateClient, fetchExchange } from "urql";
 
+import { getTenantConfig } from "./tenant-config";
+
 interface IAuthState {
   token: string;
 }

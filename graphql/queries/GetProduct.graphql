@@ -1,0 +1,11 @@
+query GetProduct($id: ID!, $channel: String) {
+  product(id: $id, channel: $channel) {
+    id
+    name
+    description
+    media {
+      url
+      alt
+    }
+  }
+}
