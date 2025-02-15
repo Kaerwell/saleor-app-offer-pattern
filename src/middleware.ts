@@ -4,7 +4,6 @@ import { getTenantConfig } from './lib/tenant-config'
 
 export async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host')
-  console.log("hostname: ", hostname)
   
   // Skip for API routes and static files
   if (

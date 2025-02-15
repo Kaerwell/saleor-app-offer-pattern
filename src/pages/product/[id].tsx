@@ -9,6 +9,10 @@ import {
   GetProductOffersQuery,
   GetProductDocument,
   GetProductQuery,
+  GetVariantDetailsDocument,
+  GetVariantDetailsQuery,
+  GetVariantsDocument,
+  GetVariantsQuery,
 } from "../../../generated/graphql";
 import { createClient } from "../../lib/create-graphql-client";
 
@@ -71,6 +75,22 @@ const getProductOffers = async (offerIds: string[]): Promise<GetProductOffersQue
   return result.data;
 };
 
+const getVariantsDetails = async (variantIds: string[]): Promise<GetVariantsQuery> => {
+  const result = await client
+    .query(GetVariantsDocument, { ids: variantIds, channel: DEFAULT_CHANNEL })
+    .toPromise();
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
+
+  if (!result.data) {
+    throw new Error("No data returned from the query");
+  }
+
+  return result.data;
+};
+
 type ParsedDescription = {
   time: string;
   blocks: {
@@ -86,16 +106,6 @@ const ProductPage = () => {
   const { id } = router.query;
   const productOfferId = typeof id === "string" ? id : undefined;
 
-  const { data: productData, isLoading: isLoadingProduct } = useQuery<GetProductQuery>({
-    queryKey: ["product", productOfferId],
-    queryFn: () => getProduct(productOfferId || ""),
-    enabled: !!productOfferId,
-  });
-
-  console.log("productData: ", productData);
-
-  const description = JSON.parse(productData?.product?.description || "{}") as ParsedDescription;
-
   const { data: productOfferData, isLoading: isLoadingProductOffer } =
     useQuery<GetProductOfferQuery>({
       queryKey: ["productOffer", productOfferId],
@@ -103,9 +113,19 @@ const ProductPage = () => {
       enabled: !!productOfferId,
     });
 
-  const attributes = productOfferData?.page?.attributes;
+  const productId = productOfferData?.page?.attributes.find(
+    (attr) => attr.attribute.slug === "product"
+  )?.values[0]?.reference;
 
-  const productOffersIds = attributes
+  const { data: productData, isLoading: isLoadingProduct } = useQuery<GetProductQuery>({
+    queryKey: ["product", productId],
+    queryFn: () => getProduct(productId || ""),
+    enabled: !!productId,
+  });
+
+  const description = JSON.parse(productData?.product?.description || "{}") as ParsedDescription;
+
+  const productOffersIds = productOfferData?.page?.attributes
     ?.find((attr) => attr.attribute.slug === "product-offers")
     ?.values.map((value) => value.reference)
     .filter((ref): ref is string => typeof ref === "string");
@@ -117,33 +137,42 @@ const ProductPage = () => {
       enabled: !!productOffersIds,
     });
 
-  const productOfferName = attributes?.find((attr) => attr.attribute.slug === "product-offer-name")
-    ?.values[0]?.name;
-  const productOfferDescription = attributes?.find(
-    (attr) => attr.attribute.slug === "product-offer-description"
-  )?.values[0]?.name;
-  const productImageAttribute = attributes?.find(
-    (attr) => attr.attribute.slug === "product-offer-image"
-  );
+  const variantIds = productOffersData?.pages?.edges
+    .map(
+      (edge) =>
+        edge.node.attributes.find((attr) => attr.attribute.slug === "offer-variant")?.values[0]
+          ?.reference
+    )
+    ?.filter((ref): ref is string => typeof ref === "string");
+  console.log("variantIds: ", variantIds);
 
-  const wholeSaleOffer = productOffersData?.pages?.edges.find(
-    (edge) =>
-      edge.node.attributes.find((attr) => attr.attribute.slug === "variant")?.values[0]?.slug ===
-      "wholesale"
-  );
-  const wholeSalePriceRaw = wholeSaleOffer?.node.attributes.find(
+  const { data: variantData, isLoading: isLoadingVariants } = useQuery<GetVariantsQuery>({
+    queryKey: ["variants", variantIds],
+    queryFn: () => getVariantsDetails(variantIds || []),
+    enabled: !!variantIds,
+  });
+
+  const mergeVariantsAndOfferVariant = variantData?.productVariants?.edges.map((edge) => {
+    const offerVariant = productOffersData?.pages?.edges.find(
+      (inEdge) =>
+        inEdge.node.attributes?.find((attr) => attr.attribute.slug === "offer-variant")?.values[0]
+          ?.reference === edge.node.id
+    );
+    return { ...edge.node, ...offerVariant?.node };
+  });
+
+  const wholeSaleOffer = mergeVariantsAndOfferVariant?.find((edge) => edge.name === "Wholesale");
+  const wholeSalePriceRaw = wholeSaleOffer?.attributes?.find(
     (attr) => attr.attribute.slug === "offer-price"
   )?.values[0]?.name;
 
   const wholeSaleOfferPrice = JSON.parse(wholeSalePriceRaw || "{}") as ParsedOfferPrice;
 
-  const privateLabelOffer = productOffersData?.pages?.edges.find(
-    (edge) =>
-      edge.node.attributes.find((attr) => attr.attribute.slug === "variant")?.values[0]?.slug ===
-      "private-label"
+  const privateLabelOffer = mergeVariantsAndOfferVariant?.find(
+    (edge) => edge.name === "Private Label"
   );
 
-  const privateLabelOfferPriceRaw = privateLabelOffer?.node.attributes.find(
+  const privateLabelOfferPriceRaw = privateLabelOffer?.attributes?.find(
     (attr) => attr.attribute.slug === "offer-price"
   )?.values[0]?.name;
 
@@ -182,7 +211,7 @@ const ProductPage = () => {
 
             <TabsContent value="private-label" className="space-y-6">
               <div className="space-y-2">
-                <p className="text-gray-600">Sku: 1002U</p>
+                <p className="text-gray-600">Sku: {privateLabelOffer?.sku}</p>
                 <p className="text-gray-600">Minimum: 12</p>
                 <p className="text-gray-600">Box size: 12</p>
               </div>
@@ -205,7 +234,7 @@ const ProductPage = () => {
             <TabsContent value="wholesale" className="space-y-6">
               {/* Wholesale content would go here */}
               <div className="space-y-2">
-                <p className="text-gray-600">Sku: 1002U</p>
+                <p className="text-gray-600">Sku: {wholeSaleOffer?.sku}</p>
                 <p className="text-gray-600">Minimum: 12</p>
                 <p className="text-gray-600">Box size: 12</p>
               </div>
@@ -234,7 +263,7 @@ const ProductPage = () => {
             Product Description
           </h2>
           <p className="text-gray-600 mt-4 leading-relaxed">
-            {description.blocks.map((block) => block.data.text).join("\n")}
+            {description?.blocks?.map((block) => block.data.text).join("\n")}
           </p>
         </CardContent>
       </Card>

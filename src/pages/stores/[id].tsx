@@ -97,6 +97,7 @@ type ParsedOfferPrice = {
 
 const OfferCard = ({ id, name, description, media }: OfferCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  if (!id) return null;
   // const variantId = attributes.find((attr) => attr.attribute.slug === "offer-variant")?.values[0]
   //   ?.reference;
 
@@ -254,18 +255,23 @@ const StorePage = () => {
         <div>Loading products...</div>
       ) : (
         <div className="offers-grid">
-          {productsData?.products?.edges.map(({ node }) => (
-            <OfferCard
-              key={node.id}
-              id={node.id}
-              name={node.name}
-              description={node.description}
+          {productsData?.products?.edges.map(({ node }) => {
+            const productOfferId = productOffersData?.pages?.edges.find(
+              (edge) => edge.node.attributes.find((attr) => attr.attribute.slug === "product")?.values[0]?.reference === node.id
+            )?.node.id;
+            return (
+              <OfferCard
+                key={node.id}
+                id={productOfferId || ""}
+                name={node.name}
+                description={node.description}
               // slug={node.slug}
-              media={node.media}
-              // content={node.description}
-              // attributes={node.attributes}
-            />
-          ))}
+                media={node.media}
+                // content={node.description}
+                // attributes={node.attributes}
+              />
+            );
+          })}
         </div>
       )}
       <style jsx>{`

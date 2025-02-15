@@ -2,6 +2,7 @@
 fragment VariantDetails on ProductVariant {
     id
     name
+    sku
     product{
         name
     }
