@@ -40,11 +40,12 @@ export default async function handler(
   }
 
   const client = createClient(SALEOR_API_URL, async () => {
+    const token = req.body.token as string;
     const authData = await apl.get(SALEOR_API_URL);
-    if (!authData) {
+    if (!authData && !token) {
       throw new Error("No auth data found. Is the app installed?");
     }
-    return Promise.resolve({ token: authData.token });
+    return Promise.resolve({ token: token || authData?.token || "" });
   });
 
   // Get the offer page to find the variant ID and price
@@ -85,10 +86,15 @@ export default async function handler(
     return res.status(400).json({ errorMessage: "Offer price not found" });
   }
 
+  console.log("Offer price: ", offerPrice);
+
+  // Debug request client.mutation headers
+  console.log("Request headers: ", client.mutation);
+
   const createCheckoutMutation = await client
     .mutation(CreateExampleCheckoutDocument, {
       input: {
-        email: "demo@saleor.io",
+        email: "lee.abbott@example.com",
         billingAddress: {
           firstName: "John",
           lastName: "Doe",
@@ -121,10 +127,14 @@ export default async function handler(
 
   if (createCheckoutMutation.error) {
     console.error(createCheckoutMutation.error);
+    console.error(createCheckoutMutation.error.graphQLErrors[0].locations);
+    console.error(createCheckoutMutation.error.graphQLErrors[0].path);
     return res.status(400).json({
       errorMessage: `Could not create a new checkout. Error: ${createCheckoutMutation.error.message}`,
     });
   }
+
+  console.log("Create checkout mutation: ", createCheckoutMutation.data?.checkoutCreate?.errors);
 
   const checkout = createCheckoutMutation.data?.checkoutCreate?.checkout;
 

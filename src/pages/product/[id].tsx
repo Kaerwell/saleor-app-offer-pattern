@@ -180,7 +180,7 @@ const ProductPage = () => {
 
   const privateLabelOfferPrice = JSON.parse(privateLabelOfferPriceRaw || "{}") as ParsedOfferPrice;
 
-  const handleBuyClick = async (variantId: string) => {
+  const handleBuyClick = async (variantId: string, token: string) => {
     // if (!id || !offerPrice) return;
 
     setIsLoading(true);
@@ -191,8 +191,9 @@ const ProductPage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          offerId: id,
+          offerId: variantId,
           quantity: 1,
+          token: token,
         }),
       });
 
@@ -221,6 +222,9 @@ const ProductPage = () => {
       setIsLoading(false);
     }
   };
+
+  // get token from local storage
+  const token = localStorage.getItem("token");
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -295,7 +299,7 @@ const ProductPage = () => {
 
               <Button
                 className="w-full bg-gray-800 hover:bg-gray-700 text-white py-6"
-                onClick={() => handleBuyClick(wholeSaleOffer.id)}
+                onClick={() => handleBuyClick(wholeSaleOffer?.id || "", token || "")}
                 disabled={isLoading}
               >
                 {isLoading ? "Adding to cart..." : "ADD TO CART"}

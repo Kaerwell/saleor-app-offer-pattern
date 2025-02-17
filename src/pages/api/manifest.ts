@@ -19,7 +19,7 @@ export default createManifestHandler({
 
     const manifest: AppManifest = {
       name: "Saleor App Offers POC",
-      tokenTargetUrl: `${apiBaseURL}/api/register`,
+      tokenTargetUrl: `https://guy.medtechanalytics.com/api/register`,
       appUrl: iframeBaseUrl,
       /**
        * Set permissions for app if needed
@@ -55,7 +55,7 @@ export default createManifestHandler({
       author: "Saleor Commerce",
       brand: {
         logo: {
-          default: `${apiBaseURL}/logo.png`,
+          default: `https://guy.medtechanalytics.com/logo.png`,
         },
       },
     };
