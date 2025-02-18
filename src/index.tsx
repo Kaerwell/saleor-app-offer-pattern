@@ -1,15 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-nextjs";
 import { createClient, fetchExchange } from "urql";
 import { SALEOR_API_URL } from "./const";
 import Link from "next/link";
-import type {
-  GetStorePagesQuery,
-  GetStorePageTypeQuery,
-} from "../generated/graphql";
-import {
-  GetStorePagesDocument,
-  GetStorePageTypeDocument,
-} from "../generated/graphql";
+import type { GetStorePagesQuery, GetStorePageTypeQuery } from "../generated/graphql";
+import { GetStorePagesDocument, GetStorePageTypeDocument } from "../generated/graphql";
+
 const getStorePageType = async (): Promise<GetStorePageTypeQuery> => {
   const client = createClient({
     url: SALEOR_API_URL,
@@ -49,6 +45,10 @@ const getStorePages = async (pageTypeId: string): Promise<GetStorePagesQuery> =>
 };
 
 export const StoresList = () => {
+  const { isAuthenticated, accessToken, user} = useKindeAuth();
+
+  console.log("Is authenticated: ", user);
+
   const { data: pageTypeData, isLoading: isLoadingPageType } = useQuery<
     GetStorePageTypeQuery,
     Error

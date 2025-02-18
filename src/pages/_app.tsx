@@ -1,6 +1,7 @@
 import "@saleor/macaw-ui/next/style";
 import "../styles/globals.css";
 
+import { KindeProvider } from "@kinde-oss/kinde-auth-nextjs";
 import { AppBridge, AppBridgeProvider } from "@saleor/app-sdk/app-bridge";
 import { RoutePropagator } from "@saleor/app-sdk/app-bridge/next";
 import React, { useEffect } from "react";
@@ -34,17 +35,19 @@ function NextApp({ Component, pageProps }: AppProps) {
 
   return (
     <NoSSRWrapper>
-      <QueryClientProvider client={queryClient}>
-        <AppBridgeProvider appBridgeInstance={appBridgeInstance}>
-          <GraphQLProvider>
+      <KindeProvider>
+        <QueryClientProvider client={queryClient}>
+          <AppBridgeProvider appBridgeInstance={appBridgeInstance}>
+            <GraphQLProvider>
             <ThemeProvider>
               <ThemeSynchronizer />
               <RoutePropagator />
               <Component {...pageProps} />
             </ThemeProvider>
           </GraphQLProvider>
-        </AppBridgeProvider>
-      </QueryClientProvider>
+          </AppBridgeProvider>
+        </QueryClientProvider>
+      </KindeProvider>
     </NoSSRWrapper>
   );
 }
