@@ -26,10 +26,8 @@ type ParsedOfferPrice = {
 
 export type AddToCartResponseData = SuccessfulResponse | ErrorResponse;
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<AddToCartResponseData>
-) {
+
+export async function POST(req: NextApiRequest, res: NextApiResponse) {
   console.info("Add to cart has been called");
 
   const offerId = req.body.offerId as string;

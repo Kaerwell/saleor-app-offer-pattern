@@ -1,6 +1,8 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type {
   GetStoreOffersQuery,
@@ -8,18 +10,18 @@ import type {
   GetVariantQuery,
   GetStoreProductOffersQuery,
   GetProductsQuery,
-} from "../../../generated/graphql";
+} from "../../../../generated/graphql";
 import {
   GetStoreOffersDocument,
   GetStorePageDocument,
   GetStoreProductOffersDocument,
   GetVariantDocument,
   GetProductsDocument,
-} from "../../../generated/graphql";
-import { DEFAULT_CHANNEL, SALEOR_API_URL } from "../../const";
-import { createClient } from "../../lib/create-graphql-client";
-import { formatPrice } from "../../lib/format-price";
-import { AddToCartResponseData } from "../api/add-to-cart";
+} from "../../../../generated/graphql";
+import { DEFAULT_CHANNEL, SALEOR_API_URL } from "../../../const";
+import { createClient } from "../../../lib/create-graphql-client";
+import { formatPrice } from "../../../lib/format-price";
+import { AddToCartResponseData } from "../../api/add-to-cart";
 import { fetchExchange } from "urql";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -61,7 +63,9 @@ const getStorePage = async (storeId: string): Promise<GetStorePageQuery> => {
 };
 
 const getProducts = async (productIds: string[]): Promise<GetProductsQuery> => {
-  const result = await client.query(GetProductsDocument, { ids: productIds, channel: DEFAULT_CHANNEL }).toPromise();
+  const result = await client
+    .query(GetProductsDocument, { ids: productIds, channel: DEFAULT_CHANNEL })
+    .toPromise();
 
   if (result.error) {
     throw new Error(result.error.message);
@@ -96,6 +100,7 @@ type ParsedOfferPrice = {
 };
 
 const OfferCard = ({ id, name, description, media }: OfferCardProps) => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   if (!id) return null;
   // const variantId = attributes.find((attr) => attr.attribute.slug === "offer-variant")?.values[0]
@@ -195,14 +200,12 @@ const OfferCard = ({ id, name, description, media }: OfferCardProps) => {
   );
 };
 
-const StorePage = () => {
-  const router = useRouter();
-  const { id } = router.query;
-  const storeId = typeof id === "string" ? id : undefined;
+const StorePage = ({ id }: { id: string }) => {
+  const storeId = id;
 
   const { data: pageData, isLoading: isLoadingPage } = useQuery<GetStorePageQuery>({
     queryKey: ["storePage", storeId],
-    queryFn: () => getStorePage(storeId || ""),
+    queryFn: () => getStorePage(decodeURIComponent(storeId) || ""),
     enabled: !!storeId,
   });
 
@@ -257,7 +260,9 @@ const StorePage = () => {
         <div className="offers-grid">
           {productsData?.products?.edges.map(({ node }) => {
             const productOfferId = productOffersData?.pages?.edges.find(
-              (edge) => edge.node.attributes.find((attr) => attr.attribute.slug === "product")?.values[0]?.reference === node.id
+              (edge) =>
+                edge.node.attributes.find((attr) => attr.attribute.slug === "product")?.values[0]
+                  ?.reference === node.id
             )?.node.id;
             return (
               <OfferCard
@@ -265,7 +270,7 @@ const StorePage = () => {
                 id={productOfferId || ""}
                 name={node.name}
                 description={node.description}
-              // slug={node.slug}
+                // slug={node.slug}
                 media={node.media}
                 // content={node.description}
                 // attributes={node.attributes}

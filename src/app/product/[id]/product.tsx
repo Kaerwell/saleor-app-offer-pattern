@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -7,10 +9,10 @@ import {
   GetProductOffersQuery,
   GetProductQuery,
   GetVariantsQuery,
-} from "../../../generated/graphql";
-import { AddToCartResponseData } from "../api/add-to-cart";
+} from "../../../../generated/graphql";
+import { AddToCartResponseData } from "../../api/add-to-cart";
 
-import { SALEOR_API_URL } from "../../const";
+import { SALEOR_API_URL } from "../../../const";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { formatPrice } from "@/lib/format-price";
@@ -33,10 +35,8 @@ type ParsedDescription = {
   }[];
 };
 
-const ProductPage = () => {
-  const router = useRouter();
-  const { id } = router.query;
-  const productOfferId = typeof id === "string" ? id : undefined;
+const ProductPage = ({ id }: { id: string }) => {
+  const productOfferId = id
 
   const { getProduct, getProductOffer, getProductOffers, getVariantsDetails } =
     useSaleorOperations();
@@ -46,7 +46,7 @@ const ProductPage = () => {
   const { data: productOfferData, isLoading: isLoadingProductOffer } =
     useQuery<GetProductOfferQuery>({
       queryKey: ["productOffer", productOfferId],
-      queryFn: () => getProductOffer(productOfferId || ""),
+      queryFn: () => getProductOffer(decodeURIComponent(productOfferId) || ""),
       enabled: !!productOfferId,
     });
 
@@ -95,7 +95,6 @@ const ProductPage = () => {
         inEdge.node.attributes?.find((attr) => attr.attribute.slug === "offer-variant")?.values[0]
           ?.reference === edge.node.id
     );
-    console.log("offerVariant: ", edge.node);
     return {
       ...edge.node,
       ...offerVariant?.node,

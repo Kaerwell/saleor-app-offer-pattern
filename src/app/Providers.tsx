@@ -1,9 +1,11 @@
+"use client";
+
 import "@saleor/macaw-ui/next/style";
 import "../styles/globals.css";
 
 import { KindeProvider } from "@kinde-oss/kinde-auth-nextjs";
 import { AppBridge, AppBridgeProvider } from "@saleor/app-sdk/app-bridge";
-import { RoutePropagator } from "@saleor/app-sdk/app-bridge/next";
+// import { RoutePropagator } from "@saleor/app-sdk/app-bridge/next";
 import React, { useEffect } from "react";
 import { AppProps } from "next/app";
 
@@ -22,7 +24,7 @@ const queryClient = new QueryClient();
  */
 const appBridgeInstance = typeof window !== "undefined" ? new AppBridge() : undefined;
 
-function NextApp({ Component, pageProps }: AppProps) {
+const Providers = ({ children }: { children: React.ReactNode }) => {
   /**
    * Configure JSS (used by MacawUI) for SSR. If Macaw is not used, can be removed.
    */
@@ -39,17 +41,17 @@ function NextApp({ Component, pageProps }: AppProps) {
         <QueryClientProvider client={queryClient}>
           <AppBridgeProvider appBridgeInstance={appBridgeInstance}>
             <GraphQLProvider>
-            <ThemeProvider>
-              <ThemeSynchronizer />
-              <RoutePropagator />
-              <Component {...pageProps} />
-            </ThemeProvider>
-          </GraphQLProvider>
+              <ThemeProvider>
+                <ThemeSynchronizer />
+                {/* <RoutePropagator /> */}
+                {children}
+              </ThemeProvider>
+            </GraphQLProvider>
           </AppBridgeProvider>
         </QueryClientProvider>
       </KindeProvider>
     </NoSSRWrapper>
   );
-}
+};
 
-export default NextApp;
+export default Providers;

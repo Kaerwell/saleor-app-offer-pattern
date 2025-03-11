@@ -1,3 +1,6 @@
+"use client";
+
+import { Box } from "@saleor/macaw-ui/next";
 import { useQuery } from "@tanstack/react-query";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-nextjs";
 import { createClient, fetchExchange } from "urql";
@@ -45,7 +48,7 @@ const getStorePages = async (pageTypeId: string): Promise<GetStorePagesQuery> =>
 };
 
 export const StoresList = () => {
-  const { isAuthenticated, accessToken, user} = useKindeAuth();
+  const { isAuthenticated, accessToken, user } = useKindeAuth();
 
   console.log("Is authenticated: ", user);
 
@@ -95,67 +98,69 @@ export const StoresList = () => {
   }
 
   return (
-    <div className="container">
-      <h1 className="title">Our Boutiques</h1>
-      <div className="stores-grid">
-        {stores.map(({ node }) => (
-          <Link key={node.id} href={`/stores/${node.id}`}>
-            <div className="store-card">
-              <h2 className="store-title">{node.title}</h2>
-              <p className="store-slug">{node.slug}</p>
-              <span className="visit-link">Visit Store →</span>
-            </div>
-          </Link>
-        ))}
+    <Box padding={8}>
+      <div className="container">
+        <h1 className="title">Our Boutiques</h1>
+        <div className="stores-grid">
+          {stores.map(({ node }) => (
+            <Link key={node.id} href={`/stores/${node.id}`}>
+              <div className="store-card">
+                <h2 className="store-title">{node.title}</h2>
+                <p className="store-slug">{node.slug}</p>
+                <span className="visit-link">Visit Store →</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <style jsx>{`
+          .title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+          }
+
+          .stores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+          }
+
+          .store-card {
+            border: 2px solid gray;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+          }
+
+          .store-card:hover {
+            border-color: black;
+          }
+
+          .store-title {
+            font-size: 1.5rem;
+            margin: 0;
+            color: #1a1a1a;
+          }
+
+          .store-slug {
+            color: #6b7280;
+            margin: 0;
+            font-size: 0.875rem;
+          }
+
+          .store-card:hover .visit-link {
+            text-decoration: underline;
+          }
+        `}</style>
       </div>
-
-      <style jsx>{`
-        .title {
-          font-size: 2.5rem;
-          margin-bottom: 2rem;
-          color: #1a1a1a;
-        }
-
-        .stores-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 2rem;
-        }
-
-        .store-card {
-          border: 2px solid gray;
-          padding: 1.5rem;
-          text-decoration: none;
-          color: inherit;
-          transition: all 0.2s ease;
-          background: white;
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .store-card:hover {
-          border-color: black;
-        }
-
-        .store-title {
-          font-size: 1.5rem;
-          margin: 0;
-          color: #1a1a1a;
-        }
-
-        .store-slug {
-          color: #6b7280;
-          margin: 0;
-          font-size: 0.875rem;
-        }
-
-        .store-card:hover .visit-link {
-          text-decoration: underline;
-        }
-      `}</style>
-    </div>
+    </Box>
   );
 };
