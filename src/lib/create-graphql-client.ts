@@ -28,6 +28,10 @@ export const createClient = (url: string, getAuth: AuthConfig<IAuthState>["getAu
             context: {
               ...operation.context,
               fetchOptions: {
+                beforeSend: (request: Request) => {
+                  console.log('Request headers:', request.headers);
+                  return request;
+                },
                 ...fetchOptions,
                 headers: {
                   ...fetchOptions.headers,

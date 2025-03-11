@@ -40,11 +40,13 @@ export default async function handler(
   }
 
   const client = createClient(SALEOR_API_URL, async () => {
+    // get token from kinde auth
     const token = req.body.token as string;
     const authData = await apl.get(SALEOR_API_URL);
     if (!authData && !token) {
       throw new Error("No auth data found. Is the app installed?");
     }
+    console.log("Token: ", token);
     return Promise.resolve({ token: token || authData?.token || "" });
   });
 
@@ -87,14 +89,11 @@ export default async function handler(
   }
 
   console.log("Offer price: ", offerPrice);
-
-  // Debug request client.mutation headers
-  console.log("Request headers: ", client.mutation);
-
+  
   const createCheckoutMutation = await client
     .mutation(CreateExampleCheckoutDocument, {
       input: {
-        email: "lee.abbott@example.com",
+        email: "victoronline9@gmail.com",
         billingAddress: {
           firstName: "John",
           lastName: "Doe",
@@ -116,9 +115,9 @@ export default async function handler(
         channel: DEFAULT_CHANNEL,
         lines: [
           {
-            quantity: 1,
+            quantity: 10,
             variantId,
-            price: offerPrice.amount,
+            // price: offerPrice.amount,
           },
         ],
       },

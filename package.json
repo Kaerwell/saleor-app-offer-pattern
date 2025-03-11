@@ -27,6 +27,7 @@
     "@saleor/macaw-ui": "^0.8.0-pre.101",
     "@tailwindcss/postcss": "^4.0.6",
     "@tanstack/react-query": "^4.35.7",
+    "@urql/core": "^5.1.0",
     "@urql/exchange-auth": "^1.0.0",
     "@vitejs/plugin-react": "^3.0.1",
     "class-variance-authority": "^0.7.1",

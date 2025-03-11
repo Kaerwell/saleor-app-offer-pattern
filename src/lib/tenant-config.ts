@@ -16,7 +16,7 @@ export interface TenantConfig {
     const domain = hostname.split(':')[0]
     
     // For local development, use the default store from env
-    if (domain === 'localhost' || domain === 'guy.medtechanalytics.com') {
+    if (domain === 'localhost' || domain === 'victor.kaerwell.com') {
       return {
         storeSlug: process.env.NEXT_PUBLIC_DEFAULT_STORE_SLUG || 'default-store',
         domain: 'localhost'

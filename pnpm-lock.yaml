@@ -41,6 +41,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^4.35.7
         version: 4.36.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@urql/core':
+        specifier: ^5.1.0
+        version: 5.1.0(graphql@16.10.0)
       '@urql/exchange-auth':
         specifier: ^1.0.0
         version: 1.0.0(graphql@16.10.0)

@@ -1,26 +1,37 @@
-
 fragment VariantDetails on ProductVariant {
-    id
+  id
+  name
+  sku
+  product {
     name
-    sku
-    product{
+  }
+  attributes {
+    attribute {
+      slug
+    }
+    values {
+      ... on AttributeValue {
+        id
         name
+        reference
+        value
+      }
     }
-    pricing{
-        onSale
-        discount{
-            gross{
-                currency
-                amount
-            }
-        }
-        price{
-            gross{
-                amount
-                currency
-            }
-        }
+  }
+  pricing {
+    onSale
+    discount {
+      gross {
+        currency
+        amount
+      }
     }
-    quantityPricing: metafield(key: "quantityPricing")
-
+    price {
+      gross {
+        amount
+        currency
+      }
+    }
+  }
+  quantityPricing: metafield(key: "quantityPricing")
 }

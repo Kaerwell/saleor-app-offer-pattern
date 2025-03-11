@@ -3,92 +3,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  GetProductOfferDocument,
   GetProductOfferQuery,
-  GetProductOffersDocument,
   GetProductOffersQuery,
-  GetProductDocument,
   GetProductQuery,
-  GetVariantsDocument,
   GetVariantsQuery,
 } from "../../../generated/graphql";
 import { AddToCartResponseData } from "../api/add-to-cart";
-import { createClient } from "../../lib/create-graphql-client";
 
-import { DEFAULT_CHANNEL, SALEOR_API_URL } from "../../const";
+import { SALEOR_API_URL } from "../../const";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { formatPrice } from "@/lib/format-price";
 import { useState } from "react";
-
-const client = createClient(SALEOR_API_URL, async () => {
-  // For frontend queries we don't need auth
-  return Promise.resolve({ token: "" });
-});
+import useSaleorOperations from "@/hooks/useSaleorOperations";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-nextjs";
 
 type ParsedOfferPrice = {
   amount: number;
   currency: string;
-};
-
-const getProduct = async (id: string): Promise<GetProductQuery> => {
-  const result = await client
-    .query(GetProductDocument, { id, channel: DEFAULT_CHANNEL })
-    .toPromise();
-
-  if (result.error) {
-    throw new Error(result.error.message);
-  }
-
-  if (!result.data) {
-    throw new Error("No data returned from the query");
-  }
-
-  return result.data;
-};
-
-const getProductOffer = async (id: string): Promise<GetProductOfferQuery> => {
-  const result = await client.query(GetProductOfferDocument, { id }).toPromise();
-
-  if (result.error) {
-    throw new Error(result.error.message);
-  }
-
-  if (!result.data) {
-    throw new Error("No data returned from the query");
-  }
-
-  return result.data;
-};
-
-const getProductOffers = async (offerIds: string[]): Promise<GetProductOffersQuery> => {
-  const result = await client.query(GetProductOffersDocument, { ids: offerIds }).toPromise();
-
-  if (result.error) {
-    throw new Error(result.error.message);
-  }
-
-  if (!result.data) {
-    throw new Error("No data returned from the query");
-  }
-
-  return result.data;
-};
-
-const getVariantsDetails = async (variantIds: string[]): Promise<GetVariantsQuery> => {
-  const result = await client
-    .query(GetVariantsDocument, { ids: variantIds, channel: DEFAULT_CHANNEL })
-    .toPromise();
-
-  if (result.error) {
-    throw new Error(result.error.message);
-  }
-
-  if (!result.data) {
-    throw new Error("No data returned from the query");
-  }
-
-  return result.data;
 };
 
 type ParsedDescription = {
@@ -105,6 +37,9 @@ const ProductPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const productOfferId = typeof id === "string" ? id : undefined;
+
+  const { getProduct, getProductOffer, getProductOffers, getVariantsDetails } =
+    useSaleorOperations();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -160,10 +95,15 @@ const ProductPage = () => {
         inEdge.node.attributes?.find((attr) => attr.attribute.slug === "offer-variant")?.values[0]
           ?.reference === edge.node.id
     );
-    return { ...edge.node, ...offerVariant?.node };
+    console.log("offerVariant: ", edge.node);
+    return {
+      ...edge.node,
+      ...offerVariant?.node,
+      type: edge.node.attributes.find((attr) => attr.attribute.slug === "pricing")?.values[0].name,
+    };
   });
 
-  const wholeSaleOffer = mergeVariantsAndOfferVariant?.find((edge) => edge.name === "Wholesale");
+  const wholeSaleOffer = mergeVariantsAndOfferVariant?.find((edge) => edge.type === "wholesale");
   const wholeSalePriceRaw = wholeSaleOffer?.attributes?.find(
     (attr) => attr.attribute.slug === "offer-price"
   )?.values[0]?.name;
@@ -171,7 +111,7 @@ const ProductPage = () => {
   const wholeSaleOfferPrice = JSON.parse(wholeSalePriceRaw || "{}") as ParsedOfferPrice;
 
   const privateLabelOffer = mergeVariantsAndOfferVariant?.find(
-    (edge) => edge.name === "Private Label"
+    (edge) => edge.type === "private label"
   );
 
   const privateLabelOfferPriceRaw = privateLabelOffer?.attributes?.find(
@@ -224,7 +164,8 @@ const ProductPage = () => {
   };
 
   // get token from local storage
-  const token = localStorage.getItem("token");
+  const { getToken } = useKindeAuth();
+  const token = getToken();
 
   return (
     <div className="container mx-auto px-4 py-8">
