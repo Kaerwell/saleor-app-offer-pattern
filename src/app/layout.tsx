@@ -1,5 +1,6 @@
 import { AuthProvider } from "./AuthProvider";
 import Providers from "./Providers";
+import { SiteHeader } from "./siteHeader";
 export const metadata = {
   title: "Kinde Auth",
   description: "Kinde with Next.js App Router",
@@ -10,7 +11,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <AuthProvider>
       <html lang="en">
         <body>
-          <Providers>{children}</Providers>
+          <Providers>
+            <SiteHeader />
+            <div className="container py-8">{children}</div>
+          </Providers>
         </body>
       </html>
     </AuthProvider>
