@@ -1,8 +1,8 @@
 import Link from "next/link"
-import { ShoppingCart } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+
+import Cart from "./Cart";
 
 
 export async function SiteHeader() {
@@ -15,7 +15,9 @@ export async function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-white">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2 pl-4">
-          <span className="text-xl font-bold">Logotype</span>
+          <Link href="/" className="text-xl font-bold">
+            Logotype
+          </Link>
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
@@ -34,12 +36,7 @@ export async function SiteHeader() {
           <Avatar className="h-10 w-10 bg-navy-700">
             <AvatarFallback className="bg-[#1a365d] text-white">{firstName?.charAt(0) + lastName?.charAt(0)}</AvatarFallback>
           </Avatar>
-          <Button variant="ghost" size="icon" className="relative">
-            <ShoppingCart className="h-6 w-6" />
-            <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-white">
-              2
-            </span>
-          </Button>
+          <Cart />
         </div>
       </div>
     </header>

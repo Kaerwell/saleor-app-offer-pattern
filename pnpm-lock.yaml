@@ -50,6 +50,9 @@ importers:
       '@urql/exchange-auth':
         specifier: ^1.0.0
         version: 1.0.0(graphql@16.10.0)
+      '@urql/next':
+        specifier: ^1.1.5
+        version: 1.1.5(next@13.5.8(@babel/core@7.26.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)(urql@4.2.1(@urql/core@5.1.0(graphql@16.10.0))(react@18.2.0))
       '@vitejs/plugin-react':
         specifier: ^3.0.1
         version: 3.1.0(vite@4.5.5(@types/node@18.19.68)(lightningcss@1.29.1))
@@ -62,6 +65,9 @@ importers:
       graphql:
         specifier: ^16.8.1
         version: 16.10.0
+      graphql-request:
+        specifier: ^7.1.2
+        version: 7.1.2(graphql@16.10.0)
       graphql-tag:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.10.0)
@@ -2446,6 +2452,13 @@ packages:
     peerDependencies:
       graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
 
+  '@urql/next@1.1.5':
+    resolution: {integrity: sha512-xCNzgf6IarQ99FN4IPvj5nwkeX1z/mpO9+R54StZOK445lXlYbQnI8s4b9tNqTHbB09gt/vKE3ByRh2NLFMyfw==}
+    peerDependencies:
+      next: '>=13.0.0'
+      react: '>=18.0.0'
+      urql: ^4.0.0
+
   '@vanilla-extract/css-utils@0.1.4':
     resolution: {integrity: sha512-3WRxMGa/VQaL32jZqRUpnnoVFSws5iPIUpQr+XlT4jXhtMeKYcA20rFK2k2Amkg04sqrO84A8hNMeABWZQesEg==}
 
@@ -3487,6 +3500,11 @@ packages:
 
   graphql-request@6.1.0:
     resolution: {integrity: sha512-p+XPfS4q7aIpKVcgmnZKhMNqhltk20hfXtkaIkTfjjmiKMJ5xrt5c743cL03y/K7y1rg3WrIC49xGiEQ4mxdNw==}
+    peerDependencies:
+      graphql: 14 - 16
+
+  graphql-request@7.1.2:
+    resolution: {integrity: sha512-+XE3iuC55C2di5ZUrB4pjgwe+nIQBuXVIK9J98wrVwojzDW3GMdSBZfxUk8l4j9TieIpjpggclxhNEU9ebGF8w==}
     peerDependencies:
       graphql: 14 - 16
 
@@ -8180,6 +8198,12 @@ snapshots:
     dependencies:
       graphql: 16.10.0
 
+  '@urql/next@1.1.5(next@13.5.8(@babel/core@7.26.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)(urql@4.2.1(@urql/core@5.1.0(graphql@16.10.0))(react@18.2.0))':
+    dependencies:
+      next: 13.5.8(@babel/core@7.26.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      react: 18.2.0
+      urql: 4.2.1(@urql/core@5.1.0(graphql@16.10.0))(react@18.2.0)
+
   '@vanilla-extract/css-utils@0.1.4': {}
 
   '@vanilla-extract/css@1.16.1':
@@ -9529,6 +9553,11 @@ snapshots:
       graphql: 16.10.0
     transitivePeerDependencies:
       - encoding
+
+  graphql-request@7.1.2(graphql@16.10.0):
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.10.0)
+      graphql: 16.10.0
 
   graphql-tag@2.12.6(graphql@16.10.0):
     dependencies:

@@ -15,6 +15,7 @@ import { GraphQLProvider } from "../providers/GraphQLProvider";
 import { ThemeProvider } from "@saleor/macaw-ui/next";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { CartProvider } from "../providers/CartProvider";
 
 const queryClient = new QueryClient();
 
@@ -42,9 +43,11 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
           <AppBridgeProvider appBridgeInstance={appBridgeInstance}>
             <GraphQLProvider>
               <ThemeProvider>
-                <ThemeSynchronizer />
-                {/* <RoutePropagator /> */}
-                {children}
+                <CartProvider>
+                  <ThemeSynchronizer />
+                  {/* <RoutePropagator /> */}
+                  {children}
+                </CartProvider>
               </ThemeProvider>
             </GraphQLProvider>
           </AppBridgeProvider>

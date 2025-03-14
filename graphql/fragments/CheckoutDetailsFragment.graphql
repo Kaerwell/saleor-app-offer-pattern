@@ -1,5 +1,13 @@
 fragment CheckoutDetails on Checkout {
   id
+  availablePaymentGateways {
+    id
+    name
+    config {
+      field
+      value
+    }
+  }
   token
   lines {
     id

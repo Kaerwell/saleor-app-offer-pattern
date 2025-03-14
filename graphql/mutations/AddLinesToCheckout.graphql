@@ -3,5 +3,12 @@ mutation AddLinesToCheckout($id: ID!, $lines: [CheckoutLineInput!]!){
     checkout{
       ...CheckoutDetails
     }
+    errors {
+      field
+      message
+      code 
+      variants
+      lines
+    }
   }
 }

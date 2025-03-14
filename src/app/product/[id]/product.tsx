@@ -10,7 +10,7 @@ import {
   GetProductQuery,
   GetVariantsQuery,
 } from "../../../../generated/graphql";
-import { AddToCartResponseData } from "../../api/add-to-cart";
+// import { AddToCartResponseData } from "../../api/add-to-cart";
 
 import { SALEOR_API_URL } from "../../../const";
 import { useRouter } from "next/router";
@@ -19,6 +19,7 @@ import { formatPrice } from "@/lib/format-price";
 import { useState } from "react";
 import useSaleorOperations from "@/hooks/useSaleorOperations";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-nextjs";
+import { useCart } from "@/providers/CartProvider";
 
 type ParsedOfferPrice = {
   amount: number;
@@ -36,7 +37,9 @@ type ParsedDescription = {
 };
 
 const ProductPage = ({ id }: { id: string }) => {
-  const productOfferId = id
+  const productOfferId = id;
+
+  const { addToCart } = useCart();
 
   const { getProduct, getProductOffer, getProductOffers, getVariantsDetails } =
     useSaleorOperations();
@@ -98,9 +101,12 @@ const ProductPage = ({ id }: { id: string }) => {
     return {
       ...edge.node,
       ...offerVariant?.node,
+      variantId: edge.node.id,
       type: edge.node.attributes.find((attr) => attr.attribute.slug === "pricing")?.values[0].name,
     };
   });
+
+  console.log("mergeVariantsAndOfferVariant: ", mergeVariantsAndOfferVariant)
 
   const wholeSaleOffer = mergeVariantsAndOfferVariant?.find((edge) => edge.type === "wholesale");
   const wholeSalePriceRaw = wholeSaleOffer?.attributes?.find(
@@ -122,44 +128,46 @@ const ProductPage = ({ id }: { id: string }) => {
   const handleBuyClick = async (variantId: string, token: string) => {
     // if (!id || !offerPrice) return;
 
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/add-to-cart", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          offerId: variantId,
-          quantity: 1,
-          token: token,
-        }),
-      });
+    await addToCart(variantId, 1);
 
-      const data = (await response.json()) as AddToCartResponseData;
+    // setIsLoading(true);
+    // try {
+    //   const response = await fetch("/api/add-to-cart", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       offerId: variantId,
+    //       quantity: 1,
+    //       token: token,
+    //     }),
+    //   });
 
-      if ("errorMessage" in data) {
-        console.error("Error adding to cart:", data.errorMessage);
-        // You might want to show an error message to the user here
-        return;
-      }
+    //   const data = (await response.json()) as AddToCartResponseData;
 
-      // You might want to show a success message or redirect to cart here
-      console.log("Successfully created order:", data.orderId);
-      // remove /graphql from SALEOR_API_URL
-      const rootPage = SALEOR_API_URL.replace("/graphql/", "");
-      console.log(rootPage);
-      // redirect to order page
-      const orderPage = `${rootPage}/dashboard/orders/${data.orderId}`;
-      console.log(orderPage);
-      // open in new tab
-      window.open(orderPage, "_blank");
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      // You might want to show an error message to the user here
-    } finally {
-      setIsLoading(false);
-    }
+    //   if ("errorMessage" in data) {
+    //     console.error("Error adding to cart:", data.errorMessage);
+    //     // You might want to show an error message to the user here
+    //     return;
+    //   }
+
+    //   // You might want to show a success message or redirect to cart here
+    //   console.log("Successfully created order:", data.orderId);
+    //   // remove /graphql from SALEOR_API_URL
+    //   const rootPage = SALEOR_API_URL.replace("/graphql/", "");
+    //   console.log(rootPage);
+    //   // redirect to order page
+    //   const orderPage = `${rootPage}/dashboard/orders/${data.orderId}`;
+    //   console.log(orderPage);
+    //   // open in new tab
+    //   window.open(orderPage, "_blank");
+    // } catch (error) {
+    //   console.error("Error adding to cart:", error);
+    //   // You might want to show an error message to the user here
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   // get token from local storage
@@ -214,7 +222,10 @@ const ProductPage = ({ id }: { id: string }) => {
                 </p>
               </div>
 
-              <Button className="w-full bg-gray-800 hover:bg-gray-700 text-white py-6">
+              <Button
+                className="w-full bg-gray-800 hover:bg-gray-700 text-white py-6"
+                onClick={() => handleBuyClick(privateLabelOffer?.id || "", token || "")}
+              >
                 DESIGN YOUR PRIVATE LABEL
               </Button>
             </TabsContent>
