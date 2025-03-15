@@ -2,7 +2,17 @@ mutation CompleteCheckout($id: ID!) {
   checkoutComplete(id: $id) {
     order {
       id
+      userEmail
+      created
+      status
+      total {
+        gross {
+          amount
+        }
+      }
     }
+    confirmationData
+    confirmationNeeded
     errors {
       message
       field
