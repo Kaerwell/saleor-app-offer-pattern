@@ -16,7 +16,6 @@ export const createCheckoutSession = async (lineItems: {
   // first we need to call the checkoutComplete mutation
   // this will give the needed confirmationData with the clientSecret
 
-
   const checkoutComplete = await client.request(CompleteCheckoutDocument, {
     id: checkoutId,
   });

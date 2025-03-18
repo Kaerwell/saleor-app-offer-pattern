@@ -28,7 +28,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const user = getUser()
   const email = user?.email!
 
-    const [, createCheckout] = useMutation(CreateExampleCheckoutDocument);
+  const [, createCheckout] = useMutation(CreateExampleCheckoutDocument);
   // const [, addLines] = useMutation(AddLinesToCheckoutDocument);
   const [checkoutResult, reexecuteQuery] = useQuery({
     query: GetCheckoutDetailsDocument,
